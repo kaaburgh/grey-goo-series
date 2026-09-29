@@ -16,16 +16,21 @@ This is speculative fiction, not an operational security project. Technical real
 
 ## The experiment
 
-The repository is also the agent's project memory.
+The repository is also the agent's project memory and execution contract.
 
-A scheduled task is expected to run periodically. On every run it:
+A scheduled task is expected to run periodically. Its external prompt should remain small: open this repository and follow `RUN.md`.
 
-1. reads `state.json`;
-2. reads `roadmap.md`, `story.md`, the latest review if one exists, and the active instruction in `modes/`;
-3. performs exactly one bounded iteration;
-4. updates the relevant project artifacts;
-5. advances `state.json` only when the iteration has completed successfully;
-6. commits the result.
+On every normal run the agent:
+
+1. reads `RUN.md` and the current `state.json` from `main`;
+2. stops without changes if `state.status` is not `"active"`;
+3. reads `roadmap.md`, `story.md`, the latest review if one exists, and the active instruction in `modes/`;
+4. performs exactly one bounded iteration;
+5. verifies that it changed only files allowed by that mode;
+6. advances `state.json` only as part of a successfully completed iteration;
+7. persists the complete iteration back to `main`, preferably as one atomic commit.
+
+A run that exists only in a temporary workspace, side branch, or unmerged pull request is not a completed iteration.
 
 For the first experiment there are only two active modes:
 
@@ -36,36 +41,51 @@ The initial cycle is deliberately simple:
 
 `write -> write -> review -> repeat`
 
+A review may pause the workflow when further automatic writing is structurally blocked or materially unsafe. A paused project requires human intervention before scheduled writing resumes.
+
 A future `roadmap-review` mode is reserved for occasional project-level editorial review, but it is not part of the initial automatic cycle.
 
 ## Repository map
 
-- `README.md` — project premise, operating rules, and context for humans or external agents.
+- `README.md` — project premise, global rules, and context for humans or external agents.
+- `RUN.md` — canonical execution contract for the scheduled task, including status handling and persistence to `main`.
 - `roadmap.md` — current creative plan and major unresolved decisions.
 - `story.md` — canonical prose draft.
 - `state.json` — tiny machine-readable workflow state.
-- `modes/write.md` — instructions for a writing iteration.
-- `modes/review.md` — instructions for a review iteration.
+- `modes/write.md` — instructions and allowed changes for a writing iteration.
+- `modes/review.md` — instructions, allowed changes, and stop brake for a review iteration.
 - `modes/roadmap-review.md` — reserved higher-level review mode.
 - `reviews/` — immutable-ish review notes produced by review iterations.
+
+## Workflow state
+
+`state.status` has three defined values:
+
+- `active` — scheduled work may continue;
+- `paused` — scheduled work must stop; `pause_reason` explains what requires intervention;
+- `complete` — the autonomous experiment has ended and scheduled work must not resume.
+
+Ordinary write iterations cannot mark the project complete. In the initial workflow, completion is a human decision.
 
 ## Principles
 
 The experiment should remain easy to understand after many autonomous runs.
 
 - One scheduled task, not a collection of mutually coordinating scheduled tasks.
-- Git is the source of truth and the audit trail.
+- Git `main` is the source of truth and the audit trail.
+- The scheduler contract lives in the repository rather than only in an external prompt.
 - One run performs one bounded unit of work.
 - Review and writing are separate activities.
 - Prefer explicit state over hidden assumptions.
 - Do not silently change the central premise or workflow.
 - Changes to the roadmap should be visible and justified.
+- The roadmap defines direction and constraints; the latest review defines the immediate priority. If they conflict, the roadmap wins.
 - Preserve ambiguity where it makes the fiction stronger; do not prematurely turn the premise into a fixed plot.
 - Narrative quality matters more than maximizing word count.
 
 ## For an external reviewer
 
-If you are Claude, ChatGPT, or another model asked to assess this project, begin by reading this file, `roadmap.md`, `state.json`, both active mode files, the latest entries in `reviews/`, and the relevant portion of `story.md`.
+If you are Claude, ChatGPT, or another model asked to assess this project, begin by reading this file, `RUN.md`, `roadmap.md`, `state.json`, both active mode files, the review referenced by `state.latest_review` if one exists, and the relevant portion of `story.md`.
 
 Please distinguish between:
 
