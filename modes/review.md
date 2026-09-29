@@ -23,11 +23,14 @@ Pay particular attention to:
 
 - continuity and causality;
 - character motivation and distinctness;
-- pacing;
+- whether the primary human point of view has a continuing desire, stake, and changing relationship to the experiment;
+- pacing, including the roadmap's soft word budget for the current movement;
 - unnecessary exposition;
 - repeated beats or ideas;
 - technical plausibility at the level needed by the story;
+- whether technical realism is being carried by consequences and institutional texture rather than reusable operational mechanics;
 - unjustified jumps in the agent's capabilities;
+- whether the agent's major actions remain plausibly traceable to the canonical initial instruction;
 - whether escalation remains gradual and locally rational;
 - whether the draft is still serving the current roadmap;
 - whether the accumulated prose has drifted into operational intrusion guidance rather than narrative-level technical realism;
@@ -47,6 +50,12 @@ Use this structure:
 
 ```markdown
 # Review NNNN
+
+## Progress snapshot
+
+Approximate story word count: ...
+Current movement: ...
+Pacing against roadmap: on pace | slightly slow | slightly fast | materially off pace
 
 ## What changed
 
@@ -69,6 +78,8 @@ A short ordered set of instructions for the next one or two write iterations.
 Note any evidence that the roadmap itself may need revision. Do not revise it here.
 Write "None" if there is no meaningful concern.
 ```
+
+The word count may be approximate; it exists to prevent unnoticed structural bloat, not to optimize to an exact number.
 
 The review should be useful to a writer, not a scorecard. Avoid numerical ratings unless a future workflow explicitly asks for them.
 
@@ -106,11 +117,10 @@ Only after the review file is complete:
 
 1. Let `N` be the current value of `state.iteration`.
 2. Set `latest_review` to `"reviews/NNNN.md"` for this review.
-3. Set `last_completed_iteration` to `N`.
-4. Set `iteration` to `N + 1`.
-5. Set `write_iterations_since_review` to `0`.
-6. Set `mode` to `"write"`.
-7. Normally leave `status` as `"active"` and `pause_reason` as `null`; if the stop brake applies, set them to `"paused"` and the reason instead.
+3. Set `iteration` to `N + 1`.
+4. Set `write_iterations_since_review` to `0`.
+5. Set `mode` to `"write"`.
+6. Normally leave `status` as `"active"` and `pause_reason` as `null`; if the stop brake applies, set them to `"paused"` and the reason instead.
 
 Persist the review and the corresponding state transition together as one iteration, following `RUN.md`.
 
