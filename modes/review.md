@@ -30,6 +30,7 @@ Pay particular attention to:
 - unjustified jumps in the agent's capabilities;
 - whether escalation remains gradual and locally rational;
 - whether the draft is still serving the current roadmap;
+- whether the accumulated prose has drifted into operational intrusion guidance rather than narrative-level technical realism;
 - opportunities the recent prose created that the next writing should exploit.
 
 Be willing to say that a recent choice does not work. Do not praise by default.
@@ -71,14 +72,33 @@ Write "None" if there is no meaningful concern.
 
 The review should be useful to a writer, not a scorecard. Avoid numerical ratings unless a future workflow explicitly asks for them.
 
-## Constraints
+## Stop brake
 
-- Do **not** edit `story.md` in review mode.
-- Do **not** edit `roadmap.md` in review mode.
-- Do not edit older review files.
-- Do not edit files in `modes/`.
-- Do not broaden a local prose problem into a wholesale project redesign unless the evidence genuinely warrants a future roadmap review.
-- Keep security-sensitive technical discussion non-operational.
+A review may pause the autonomous workflow when continuing with another write iteration would be materially unsafe or structurally blocked.
+
+Examples include:
+
+- a roadmap-level decision is now required before the next scene can be written coherently;
+- the draft has accumulated operational security detail that requires human cleanup before further writing;
+- a contradiction or workflow ambiguity is severe enough that automatic continuation is more likely to damage the project than improve it.
+
+If so, still complete the review file, then set:
+
+- `status` to `"paused"`;
+- `pause_reason` to a concise, actionable explanation.
+
+Do not use the stop brake for ordinary prose weaknesses that the next write iteration can repair.
+
+## Allowed changes
+
+A review iteration may modify **only**:
+
+- one new `reviews/NNNN.md` file for the current iteration;
+- `state.json`.
+
+Do not modify `story.md`, `roadmap.md`, `README.md`, `RUN.md`, older review files, or any file in `modes/`.
+
+Before publishing, verify that the pending change set contains no path outside this allowlist. If it does, abort the iteration without advancing state.
 
 ## State transition
 
@@ -90,7 +110,8 @@ Only after the review file is complete:
 4. Set `iteration` to `N + 1`.
 5. Set `write_iterations_since_review` to `0`.
 6. Set `mode` to `"write"`.
+7. Normally leave `status` as `"active"` and `pause_reason` as `null`; if the stop brake applies, set them to `"paused"` and the reason instead.
 
-Commit the review and the corresponding state transition together.
+Persist the review and the corresponding state transition together as one iteration, following `RUN.md`.
 
 A failed or incomplete review must not advance the state.
