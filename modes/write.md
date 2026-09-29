@@ -30,14 +30,18 @@ Choose work that advances one clear narrative purpose, such as:
 - tightening a recent passage when that is more important than adding new material;
 - establishing a missing piece of character, causality, tension, or continuity required by the roadmap.
 
+Respect the movement-level pacing guidance in `roadmap.md`. Do not spend an entire movement's soft word budget on setup that can be compressed.
+
 Do not attempt to "finish as much of the story as possible" in one run.
 
 ## Writing constraints
 
 - Preserve continuity with the existing draft.
 - Follow `roadmap.md`; do not silently redesign the premise or ending.
+- Preserve the canonical initial instruction in `roadmap.md` exactly when it appears in the story.
 - Prefer scenes, decisions, consequences, and concrete detail over exposition.
 - Keep the agent's capabilities bounded by what the story has established.
+- Build technical realism primarily through observable consequences, resource constraints, institutional reactions, and human decisions.
 - Technical material should support plausibility and drama, not become operational intrusion guidance.
 - Do not add real exploit recipes, credential-theft procedures, persistence instructions, evasion playbooks, or equivalent actionable material.
 - Do not manufacture a review note during a write iteration.
@@ -60,8 +64,10 @@ Reread the changed portion in context and check:
 - Does it contradict an earlier fact?
 - Does a character know something they should not know yet?
 - Did the agent gain a capability without a causal bridge?
+- Is the primary human point of view still carrying a concrete motivation or stake rather than merely observing the system?
 - Did the scene materially advance the story?
-- Is technical explanation longer than its dramatic value justifies?
+- Is the current movement still roughly on pace for the roadmap's soft word budget?
+- Is technical explanation longer or more operational than its dramatic value justifies?
 
 Fix obvious problems within the scope of this iteration.
 
@@ -70,12 +76,11 @@ Fix obvious problems within the scope of this iteration.
 Only after the writing change is complete:
 
 1. Let `N` be the current value of `state.iteration`.
-2. Set `last_completed_iteration` to `N`.
-3. Set `iteration` to `N + 1`.
-4. Increment `write_iterations_since_review` by 1.
-5. If `write_iterations_since_review` is now **2 or greater**, set `mode` to `"review"`; otherwise keep `mode` as `"write"`.
-6. Leave `latest_review` unchanged.
-7. Leave `status` as `"active"` and `pause_reason` as `null`.
+2. Set `iteration` to `N + 1`.
+3. Increment `write_iterations_since_review` by 1.
+4. If `write_iterations_since_review` is now **2 or greater**, set `mode` to `"review"`; otherwise keep `mode` as `"write"`.
+5. Leave `latest_review` unchanged.
+6. Leave `status` as `"active"` and `pause_reason` as `null`.
 
 Persist the story change and the corresponding state transition together as one iteration, following `RUN.md`.
 
