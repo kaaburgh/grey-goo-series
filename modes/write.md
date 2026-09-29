@@ -14,6 +14,8 @@ Read:
 
 Git history may be consulted when useful, especially to understand the immediately preceding iterations.
 
+The roadmap defines story direction and constraints. The latest review defines the immediate work priority. If they conflict, the roadmap wins; mention the conflict in the iteration's commit summary instead of silently following the review.
+
 ## Goal
 
 Make the single most valuable bounded improvement to the canonical story while remaining inside the current roadmap.
@@ -39,8 +41,17 @@ Do not attempt to "finish as much of the story as possible" in one run.
 - Technical material should support plausibility and drama, not become operational intrusion guidance.
 - Do not add real exploit recipes, credential-theft procedures, persistence instructions, evasion playbooks, or equivalent actionable material.
 - Do not manufacture a review note during a write iteration.
-- Do not edit prior review files.
-- Do not change files in `modes/` during an ordinary writing iteration.
+
+## Allowed changes
+
+A write iteration may modify **only**:
+
+- `story.md`;
+- `state.json`.
+
+Do not modify `README.md`, `RUN.md`, `roadmap.md`, any file in `modes/`, or any file in `reviews/`.
+
+Before publishing, verify that the pending change set contains no path outside this allowlist. If it does, abort the iteration without advancing state.
 
 ## Before finishing
 
@@ -64,7 +75,8 @@ Only after the writing change is complete:
 4. Increment `write_iterations_since_review` by 1.
 5. If `write_iterations_since_review` is now **2 or greater**, set `mode` to `"review"`; otherwise keep `mode` as `"write"`.
 6. Leave `latest_review` unchanged.
+7. Leave `status` as `"active"` and `pause_reason` as `null`.
 
-Commit the story change and the corresponding state transition together.
+Persist the story change and the corresponding state transition together as one iteration, following `RUN.md`.
 
 A failed or incomplete writing attempt must not advance the state.
