@@ -27,10 +27,12 @@ On every normal run the agent:
 3. reads `roadmap.md`, `story.md`, the latest review if one exists, and the active instruction in `modes/`;
 4. performs exactly one bounded iteration;
 5. verifies that it changed only files allowed by that mode;
-6. advances `state.json` only as part of a successfully completed iteration;
-7. persists the complete iteration back to `main`, preferably as one atomic commit.
+6. publishes the content/review artifact to `main` using the normal connected GitHub file-write path;
+7. re-reads canonical `main`, then publishes `state.json` **last** as the iteration checkpoint.
 
-A run that exists only in a temporary workspace, side branch, or unmerged pull request is not a completed iteration.
+Iteration publication deliberately uses two commits. The artifact commit comes first; the `state.json` checkpoint comes second. If a run stops between them, the next run recovers the pending artifact instead of generating the iteration again.
+
+The workflow must not manually move Git refs with `update_ref`, force-push, or equivalent low-level fast-forward operations. A run that exists only in a temporary workspace, side branch, or unmerged pull request is not a completed iteration.
 
 For the first experiment there are only two active modes:
 
@@ -73,6 +75,8 @@ The experiment should remain easy to understand after many autonomous runs.
 
 - One scheduled task, not a collection of mutually coordinating scheduled tasks.
 - Git `main` is the source of truth and the audit trail.
+- `state.json` is the iteration checkpoint and is published after its artifact.
+- A partially published artifact is recovered, not regenerated.
 - The scheduler contract lives in the repository rather than only in an external prompt.
 - One run performs one bounded unit of work.
 - Review and writing are separate activities.
