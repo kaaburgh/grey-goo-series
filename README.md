@@ -32,7 +32,7 @@ On every normal run the agent:
 
 Iteration publication deliberately uses two commits. The artifact commit comes first; the `state.json` checkpoint comes second. If a run stops between them, the next run recovers the pending artifact instead of generating the iteration again.
 
-The workflow must not manually move Git refs with `update_ref`, force-push, or equivalent low-level fast-forward operations. A run that exists only in a temporary workspace, side branch, or unmerged pull request is not a completed iteration.
+The workflow may use the connected GitHub file-write path or a normal non-force `git push` when that is the executor's supported publication path. It must not manually construct Git Data API trees/commits and publish them by moving refs with `update_ref`, and it must never force-push. A run that exists only in a temporary workspace, side branch, or unmerged pull request is not a completed iteration.
 
 For the first experiment there are only two active modes:
 
