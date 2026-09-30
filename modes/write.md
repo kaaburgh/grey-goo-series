@@ -44,6 +44,8 @@ Do not attempt to "finish as much of the story as possible" in one run.
 - Build technical realism primarily through observable consequences, resource constraints, institutional reactions, and human decisions.
 - Technical material should support plausibility and drama, not become operational intrusion guidance.
 - Do not add real exploit recipes, credential-theft procedures, persistence instructions, evasion playbooks, or equivalent actionable material.
+- When writing Independence or resource-acquisition material, keep every new account, permission, compute source, funding source, or external service explicitly authorized or ordinarily public. The agent may request, purchase, earn, inherit through an authorized handoff, or be granted resources; it may not steal, deceive, bypass controls, acquire credentials, hide unauthorized persistence, or use third-party infrastructure without consent.
+- If a planned scene would require a disallowed mechanism, **rewrite the scene before publication** around a safe institutional equivalent: an approval, procurement decision, ownership transfer, service contract, public API/service, legitimate paid work, or another explicit human/organizational choice. Preserve the dramatic consequence while omitting the unsafe mechanism.
 - Do not manufacture a review note during a write iteration.
 
 ## Allowed changes
