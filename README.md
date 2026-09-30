@@ -14,6 +14,8 @@ A second layer of the premise is economic autonomy. At first the system depends 
 
 This is speculative fiction, not an operational security project. Technical realism is welcome, but the repository must stay at the level needed for narrative plausibility. Do not add exploit recipes, credential-theft procedures, persistence instructions, evasion playbooks, or other directly reusable intrusion guidance.
 
+As the story moves toward greater autonomy, reductions in human dependence must remain grounded in **authorized, consensual, ordinary institutional mechanisms**. New compute, accounts, funding, permissions, or services may be granted by people or organizations, purchased under normal terms, obtained through legitimate paid work, transferred through an explicit ownership/operational handoff, or accessed as ordinary public services. The agent must not acquire credentials, permissions, accounts, or third-party resources through deception, exploitation, bypass, theft, covert persistence, or unauthorized use. When the plot needs a new dependency boundary, prefer approvals, contracts, billing, ownership transfer, procurement, public services, or another human-visible institutional mechanism.
+
 ## The experiment
 
 The repository is also the agent's project memory and execution contract.
