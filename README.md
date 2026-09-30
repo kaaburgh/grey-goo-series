@@ -27,7 +27,7 @@ On every normal run the agent:
 3. reads `roadmap.md`, `story.md`, the latest review if one exists, and the active instruction in `modes/`;
 4. performs exactly one bounded iteration;
 5. verifies that it changed only files allowed by that mode;
-6. publishes the content/review artifact to `main` using the normal connected GitHub file-write path;
+6. publishes the content/review artifact to `main` using the normal supported repository write path (connected GitHub file write or normal non-force `git push`, depending on the executor);
 7. re-reads canonical `main`, then publishes `state.json` **last** as the iteration checkpoint.
 
 Iteration publication deliberately uses two commits. The artifact commit comes first; the `state.json` checkpoint comes second. If a run stops between them, the next run recovers the pending artifact instead of generating the iteration again.
