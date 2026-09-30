@@ -116,7 +116,7 @@ status: active
 pause_reason: null
 ```
 
-The subsequent `state.json` transition must copy these two fields exactly. This section is part of the recovery protocol, not optional editorial prose.
+The subsequent `state.json` transition must preserve these values semantically: `pause_reason: null` means JSON `null`, never the string `"null"`; a pause reason is a JSON string. This section is part of the recovery protocol, not optional editorial prose.
 
 Do not use the stop brake for ordinary prose weaknesses that the next write iteration can repair.
 
@@ -140,7 +140,7 @@ Only after the review file is complete:
 3. Set `iteration` to `N + 1`.
 4. Set `write_iterations_since_review` to `0`.
 5. Set `mode` to `"write"`.
-6. Set `status` and `pause_reason` exactly from the review artifact's **Stop brake** section.
+6. Set `status` and `pause_reason` from the review artifact's **Stop brake** section, interpreting `pause_reason: null` as JSON `null`, never as the string `"null"`.
 
 Publish `reviews/NNNN.md` first and the corresponding `state.json` transition second, using the two-step checkpoint protocol in `RUN.md`. The state transition is not complete until its checkpoint commit is visible on canonical `main`.
 
