@@ -122,6 +122,8 @@ Only after the review file is complete:
 5. Set `mode` to `"write"`.
 6. Normally leave `status` as `"active"` and `pause_reason` as `null`; if the stop brake applies, set them to `"paused"` and the reason instead.
 
-Persist the review and the corresponding state transition together as one iteration, following `RUN.md`.
+Publish `reviews/NNNN.md` first and the corresponding `state.json` transition second, using the two-step checkpoint protocol in `RUN.md`. The state transition is not complete until its checkpoint commit is visible on canonical `main`.
+
+If a valid pending `reviews/NNNN.md` artifact for this iteration is already present on `main`, recover it according to `RUN.md` instead of writing another review.
 
 A failed or incomplete review must not advance the state.
