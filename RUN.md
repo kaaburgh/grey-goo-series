@@ -99,38 +99,49 @@ Recovery is deliberately mechanical. Do not re-evaluate the artistic quality, ro
 
 ### Recovering write mode
 
-If `state.json` still describes iteration `N` in write mode:
+Recovery applies only when both are true:
 
-1. Inspect recent canonical `main` history for a commit whose message starts with `iter NNNN write-content:`.
-2. Accept it as the pending artifact only if all of the following are mechanically true:
+- `state.json` still describes iteration `N` in write mode; and
+- canonical `main` contains a commit whose message starts with `iter NNNN write-content:` and that commit is newer than the checkpoint/state commit from which iteration `N` began.
+
+If no such commit exists, this is **not** a recovery case. Perform iteration `N` normally according to `modes/write.md`.
+
+When a candidate pending artifact exists:
+
+1. Accept it only if all of the following are mechanically true:
    - the commit is on current canonical `main`;
-   - it is newer than the checkpoint/state commit from which iteration `N` began;
    - its changed paths are exactly `story.md`;
    - no later `iter NNNN checkpoint` exists;
    - current `state.json` still describes iteration `N` in write mode.
-3. If those checks pass, do **not** generate more prose. Publish only the deterministic `state.json` transition defined by `modes/write.md` as `iter NNNN checkpoint`.
-4. Verify that the checkpoint commit changed exactly `state.json`.
-5. If the matching artifact is absent, ambiguous, or fails any mechanical check, stop and report the blocker rather than guessing.
+2. If those checks pass, do **not** generate more prose. Publish only the deterministic `state.json` transition defined by `modes/write.md` as `iter NNNN checkpoint`.
+3. Verify that the checkpoint commit changed exactly `state.json`.
+4. If a candidate artifact exists but is ambiguous or fails any mechanical check, stop and report the blocker rather than guessing.
 
 ### Recovering review mode
 
-If `state.json` still describes iteration `N` in review mode:
+Recovery applies only when both are true:
 
-1. Require `reviews/NNNN.md` to exist on current canonical `main`.
-2. Identify its `iter NNNN review-content` commit and accept it as the pending artifact only if all of the following are mechanically true:
+- `state.json` still describes iteration `N` in review mode; and
+- `reviews/NNNN.md` already exists on current canonical `main`.
+
+If `reviews/NNNN.md` does not exist, this is **not** a recovery case. Perform iteration `N` normally according to `modes/review.md`.
+
+When a candidate pending review exists:
+
+1. Identify its `iter NNNN review-content` commit and accept it only if all of the following are mechanically true:
    - the commit is on current canonical `main`;
    - it is newer than the checkpoint/state commit from which iteration `N` began;
    - its changed paths are exactly `reviews/NNNN.md`;
    - no later `iter NNNN checkpoint` exists;
    - current `state.json` still describes iteration `N` in review mode;
    - the review contains a valid **Stop brake** section in the exact format defined by `modes/review.md`.
-3. If those checks pass, do **not** write another review.
-4. Build the missing `state.json` transition from the ordinary review transition plus the persisted Stop brake fields:
-   - `status: active` and `pause_reason: null` when the review records no stop;
-   - `status: paused` and the recorded reason when the review records a pause.
-5. Publish only that missing transition as `iter NNNN checkpoint`.
-6. Verify that the checkpoint commit changed exactly `state.json`.
-7. If the pending artifact is absent, ambiguous, malformed, or fails any mechanical check, stop and report the blocker rather than guessing.
+2. If those checks pass, do **not** write another review.
+3. Build the missing `state.json` transition from the ordinary review transition plus the persisted Stop brake fields:
+   - `status: active` and JSON `pause_reason: null` when the review records `pause_reason: null`;
+   - `status: paused` and the recorded reason string when the review records a pause.
+4. Publish only that missing transition as `iter NNNN checkpoint`.
+5. Verify that the checkpoint commit changed exactly `state.json`.
+6. If a candidate review exists but is ambiguous, malformed, or fails any mechanical check, stop and report the blocker rather than guessing.
 
 ## Concurrency and publication failures
 
