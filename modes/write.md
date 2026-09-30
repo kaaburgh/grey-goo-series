@@ -82,6 +82,8 @@ Only after the writing change is complete:
 5. Leave `latest_review` unchanged.
 6. Leave `status` as `"active"` and `pause_reason` as `null`.
 
-Persist the story change and the corresponding state transition together as one iteration, following `RUN.md`.
+Publish the completed `story.md` artifact first and the corresponding `state.json` transition second, using the two-step checkpoint protocol in `RUN.md`. The state transition is not complete until its checkpoint commit is visible on canonical `main`.
+
+If a valid pending write artifact for this iteration is already present on `main`, recover it according to `RUN.md` instead of generating more prose.
 
 A failed or incomplete writing attempt must not advance the state.
