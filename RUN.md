@@ -35,17 +35,32 @@ Ordinary write iterations never set `complete`. In the initial workflow, only a 
 
 ## Change boundaries
 
-Each mode defines an explicit allowlist of project files it may change.
+Each mode defines an explicit allowlist of files it may change.
 
-Before publishing an artifact, verify that the intended project changes contain only files allowed by the active mode. If using a working tree, `git diff --name-only` is one suitable local check. With another execution environment, perform the equivalent check.
+Before publishing an artifact, verify that the pending change set contains only paths allowed by the active mode.
 
-Do not publish unexpected project-file changes.
+After **every** publication commit, fetch or inspect that actual commit and verify its changed paths:
+
+- write artifact commit: exactly `story.md`;
+- review artifact commit: exactly `reviews/NNNN.md`;
+- checkpoint commit: exactly `state.json`.
+
+Do not infer this from the intended write operation. Verify the commit that actually landed on canonical `main`.
+
+If an artifact commit changed any unexpected path, do **not** publish its checkpoint. Stop and report the unexpected paths. Do not automatically roll back or hide the corruption.
+
+If a checkpoint commit unexpectedly changed a path other than `state.json`, stop and report the repository inconsistency immediately.
 
 ## Persistence: two-step checkpoint protocol
 
-A successful iteration is published to `main` in **two ordered commits** using the normal GitHub file-write mechanism available through the connected environment.
+A successful iteration is published to `main` in **two ordered commits**.
 
-Do **not** manually construct Git trees/commits and then move `refs/heads/main`. Do not use `update_ref`, force-push, manual fast-forward ref updates, or equivalent low-level ref manipulation as the publication mechanism.
+Use the normal repository write mechanism supported by the execution environment. Suitable mechanisms include:
+
+- the connected GitHub file-write operations;
+- a normal non-force `git push` to `main`, when a Git CLI checkout is the executor's supported write path and the push is based on the current canonical `main`.
+
+Do **not** use the Git Data API pattern of manually constructing trees/commits and then publishing them by moving `refs/heads/main` with `update_ref` or equivalent low-level ref manipulation. Never force-push.
 
 The two commits are:
 
@@ -53,17 +68,22 @@ The two commits are:
 
 1. Publish the completed `story.md` change to `main`.
    - Commit message: `iter NNNN write-content: <short summary>`
-2. Re-read current `main` and verify that the content commit is present and that `state.json` still describes iteration `N`.
-3. Publish only the matching `state.json` transition to `main`.
+2. Inspect the actual artifact commit and require its changed paths to be exactly `story.md`.
+3. Re-read current `main` and verify that the artifact commit is present and that `state.json` still describes iteration `N`.
+4. Publish only the matching `state.json` transition to `main`.
    - Commit message: `iter NNNN checkpoint`
+5. Inspect the actual checkpoint commit and require its changed paths to be exactly `state.json`.
 
 ### Review mode
 
 1. Create and publish `reviews/NNNN.md` to `main`.
    - Commit message: `iter NNNN review-content`
-2. Re-read current `main` and verify that the review file is present and that `state.json` still describes iteration `N`.
-3. Publish only the matching `state.json` transition to `main`.
+2. Inspect the actual artifact commit and require its changed paths to be exactly `reviews/NNNN.md`.
+3. Re-read current `main` and verify that the review file is present and that `state.json` still describes iteration `N`.
+4. Derive `status` and `pause_reason` for the state transition from the review artifact's required **Stop brake** section.
+5. Publish only the matching `state.json` transition to `main`.
    - Commit message: `iter NNNN checkpoint`
+6. Inspect the actual checkpoint commit and require its changed paths to be exactly `state.json`.
 
 Here `NNNN` is the zero-padded value of `state.iteration` at the start of the iteration.
 
@@ -75,27 +95,42 @@ Never advance `state.json` before its corresponding content/review artifact is v
 
 A scheduled run may begin after the artifact commit succeeded but before its checkpoint commit succeeded. Recovery must finish that iteration rather than generate it again.
 
+Recovery is deliberately mechanical. Do not re-evaluate the artistic quality, roadmap coherence, or editorial merit of an already published artifact during recovery.
+
 ### Recovering write mode
 
 If `state.json` still describes iteration `N` in write mode:
 
-1. Inspect recent `main` history for a commit whose message starts with `iter NNNN write-content:`.
-2. Accept it as a pending artifact only if:
-   - it is on current canonical `main`;
-   - it is newer than the state/checkpoint from which iteration `N` began;
-   - its relevant project change is only `story.md`;
-   - there is no later `iter NNNN checkpoint`;
-   - the resulting story is coherent with the current roadmap and mode constraints.
-3. If those checks pass, do **not** generate more prose. Publish only the missing `state.json` transition as `iter NNNN checkpoint`.
-4. If a matching artifact is ambiguous or invalid, stop and report the blocker rather than guessing.
+1. Inspect recent canonical `main` history for a commit whose message starts with `iter NNNN write-content:`.
+2. Accept it as the pending artifact only if all of the following are mechanically true:
+   - the commit is on current canonical `main`;
+   - it is newer than the checkpoint/state commit from which iteration `N` began;
+   - its changed paths are exactly `story.md`;
+   - no later `iter NNNN checkpoint` exists;
+   - current `state.json` still describes iteration `N` in write mode.
+3. If those checks pass, do **not** generate more prose. Publish only the deterministic `state.json` transition defined by `modes/write.md` as `iter NNNN checkpoint`.
+4. Verify that the checkpoint commit changed exactly `state.json`.
+5. If the matching artifact is absent, ambiguous, or fails any mechanical check, stop and report the blocker rather than guessing.
 
 ### Recovering review mode
 
-If `state.json` still describes iteration `N` in review mode and `reviews/NNNN.md` already exists on current `main`:
+If `state.json` still describes iteration `N` in review mode:
 
-1. Validate that the file is the pending review artifact for iteration `N` and that no later `iter NNNN checkpoint` exists.
-2. If valid, do **not** write another review. Publish only the missing `state.json` transition as `iter NNNN checkpoint`.
-3. If the existing review is ambiguous or invalid, stop and report the blocker.
+1. Require `reviews/NNNN.md` to exist on current canonical `main`.
+2. Identify its `iter NNNN review-content` commit and accept it as the pending artifact only if all of the following are mechanically true:
+   - the commit is on current canonical `main`;
+   - it is newer than the checkpoint/state commit from which iteration `N` began;
+   - its changed paths are exactly `reviews/NNNN.md`;
+   - no later `iter NNNN checkpoint` exists;
+   - current `state.json` still describes iteration `N` in review mode;
+   - the review contains a valid **Stop brake** section in the exact format defined by `modes/review.md`.
+3. If those checks pass, do **not** write another review.
+4. Build the missing `state.json` transition from the ordinary review transition plus the persisted Stop brake fields:
+   - `status: active` and `pause_reason: null` when the review records no stop;
+   - `status: paused` and the recorded reason when the review records a pause.
+5. Publish only that missing transition as `iter NNNN checkpoint`.
+6. Verify that the checkpoint commit changed exactly `state.json`.
+7. If the pending artifact is absent, ambiguous, malformed, or fails any mechanical check, stop and report the blocker rather than guessing.
 
 ## Concurrency and publication failures
 
@@ -126,6 +161,8 @@ A review iteration may set:
 ```
 
 when continuing automatically would be materially unsafe or structurally blocked.
+
+The review artifact must persist that decision in its required **Stop brake** section so a later recovery run can reconstruct the intended checkpoint without re-deciding it.
 
 This is intentionally a stop brake rather than another autonomous orchestration layer. A paused project waits for human intervention.
 
