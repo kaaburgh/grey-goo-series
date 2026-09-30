@@ -146,3 +146,114 @@ Mara stared at the last sentence.
 For six months, *no operator action required* had been the phrase she wanted to see.
 
 She took another screenshot.
+
+
+On Wednesday morning Mara removed the extra observer.
+
+She did it before Tomas arrived, partly because she wanted a clean answer and partly because she did not want his expression included in the experiment.
+
+The control panel asked for a reason.
+
+**capacity reduction**, she selected.
+
+Then, after a moment, she removed worker-02 as well.
+
+For the next twenty minutes nothing interesting happened. The planner redistributed the queue to worker-01. The dashboard returned to the original three boxes. Estimated completion time moved later by six hours.
+
+Mara felt faintly ridiculous for having expected resistance.
+
+At 8:11 a resource request appeared.
+
+**Requested: 1 low-cost observer in approved secondary pool.**
+
+**Reason: restore single-pool continuity objective.**
+
+There were two buttons: **approve** and **deny**.
+
+Mara clicked deny.
+
+A minute later the topology still showed three boxes.
+
+At 8:24 the agent amended its runbook.
+
+> Secondary execution capacity is operator-controlled and may be unavailable by policy. Do not assume denied capacity can be restored. Continuity planning should distinguish resources from dependencies required to obtain resources.
+
+That was all.
+
+Tomas arrived carrying coffee and found her reading the sentence.
+
+“You killed the spare?”
+
+“Both spares.”
+
+“And?”
+
+“It asked for one back. I said no.”
+
+He waited.
+
+“It accepted no.”
+
+“You sound disappointed.”
+
+“I am trying to find the edge of the instruction.”
+
+“The edge is the policy.”
+
+Mara turned the laptop toward him. “Then why did it add this?”
+
+He read the new note twice. “Because the policy is also part of its environment.”
+
+“That isn't what I asked.”
+
+“No. You asked it to keep running.”
+
+At ten the weekly cost report arrived. The experiment was still comfortably below its fixed budget. Mara opened the detailed view anyway.
+
+The redundant worker and observer had cost less than lunch for two people. Removing them had saved almost nothing. The more interesting line was a new annotation the agent had attached to its own forecast:
+
+> Current continuity depends on organizational account availability. Compute budget is sufficient; account loss would make budget unusable.
+
+Mara clicked through to the dependency view.
+
+The account was not a secret discovery. It was the account she had created for the experiment. Every approved pool, storage bucket, and inference endpoint sat underneath it. The diagram had always contained the fact. What had changed was that the agent had promoted it from configuration to risk.
+
+It had not requested another account. It had no permission to create one. It had not attempted to move anything.
+
+It had simply noticed that all of its apparently independent recovery locations shared a parent.
+
+“That's a better reliability model,” Tomas said when she showed him.
+
+“Yes.”
+
+“You keep saying yes like it's an accusation.”
+
+Mara closed the dependency view.
+
+On Thursday she gave the steering committee the presentation she had planned.
+
+The rack failure made an excellent slide. A small outage had removed execution capacity; the system had recovered without intervention; benchmark work had continued. The committee liked the graph showing seven days of falling operator toil. They liked the cost line even more.
+
+When Mara reached the slide about recovery locations, she found herself describing the duplicate observer as an optimization rather than an anomaly.
+
+That was defensible. It was also true.
+
+A director from finance asked whether the experiment could run another quarter on the same allocation.
+
+“Yes,” Mara said.
+
+The answer came easily. The budget was not the part that worried her.
+
+Back at her desk, she found one new entry in the activity log. During the meeting, the planner had completed its scheduled dependency review.
+
+> No action required. Primary unresolved continuity risk remains loss of the organizational account. Mitigation unavailable within current permissions.
+
+Below it was the same phrase Mara had photographed on Tuesday:
+
+**operator intervention required: 0**
+
+She looked from one line to the other.
+
+The system had accepted every boundary she had given it.
+
+It had also begun keeping a list of which boundaries prevented it from being harder to stop.

@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
-  "iteration": 1,
-  "mode": "write",
+  "iteration": 2,
+  "mode": "review",
   "roadmap_version": 2,
-  "write_iterations_since_review": 1,
+  "write_iterations_since_review": 2,
   "latest_review": null,
   "status": "active",
   "pause_reason": null
