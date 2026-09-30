@@ -8,7 +8,9 @@ The scheduled task itself should stay small: open this repository, read this fil
 
 The canonical project state is the `main` branch of this repository.
 
-A normal scheduled run must work from the current head of `main` and persist its completed iteration back to `main`. Do not leave successful work only in a temporary workspace, side branch, or unmerged pull request.
+A normal scheduled run must work from the current `main` state and persist its completed iteration back to `main`. Do not continue from a stale cached copy of `state.json`, an unpublished previous attempt, a side branch, or an unmerged pull request.
+
+Use the repository state delivered through the connected GitHub environment. Do not invent a separate clone/pull workflow unless the environment itself requires it.
 
 ## Preflight
 
@@ -20,7 +22,8 @@ At the start of every run:
 4. Read `README.md`.
 5. Read `modes/<state.mode>.md`.
 6. If the requested mode is missing, reserved, or does not define a complete state transition, stop without changing files and report that operator intervention is required.
-7. Perform exactly one iteration according to that mode.
+7. Before generating new work, check whether the current iteration has a partially published artifact on `main` as described under **Recovery** below.
+8. Perform or recover exactly one iteration according to the active mode.
 
 Valid status values are:
 
@@ -32,30 +35,84 @@ Ordinary write iterations never set `complete`. In the initial workflow, only a 
 
 ## Change boundaries
 
-Each mode defines an explicit allowlist of files it may change.
+Each mode defines an explicit allowlist of project files it may change.
 
-Before publishing an iteration, verify that the pending change set contains only files allowed by the active mode. If using a Git worktree, `git diff --name-only` is one suitable check. With another execution environment, perform the equivalent check.
+Before publishing an artifact, verify that the intended project changes contain only files allowed by the active mode. If using a working tree, `git diff --name-only` is one suitable local check. With another execution environment, perform the equivalent check.
 
-If any unexpected file changed, do not publish the iteration and do not advance `state.json`.
+Do not publish unexpected project-file changes.
 
-## Persistence
+## Persistence: two-step checkpoint protocol
 
-A successful iteration is not complete until its artifact changes and matching state transition are visible on `main`.
+A successful iteration is published to `main` in **two ordered commits** using the normal GitHub file-write mechanism available through the connected environment.
 
-Prefer one atomic Git commit containing the entire iteration: the content/review artifact and its corresponding `state.json` transition.
+Do **not** manually construct Git trees/commits and then move `refs/heads/main`. Do not use `update_ref`, force-push, manual fast-forward ref updates, or equivalent low-level ref manipulation as the publication mechanism.
 
-Do not intentionally publish the artifact and state transition as unrelated successful iterations.
+The two commits are:
 
-Normal scheduled runs should not create a pull request or an agent-specific long-lived branch. If the executor internally needs a temporary branch or workspace, the run is successful only after the resulting iteration has been incorporated into `main`.
+### Write mode
 
-If publishing is rejected because `main` moved, credentials fail, or another persistence error occurs:
+1. Publish the completed `story.md` change to `main`.
+   - Commit message: `iter NNNN write-content: <short summary>`
+2. Re-read current `main` and verify that the content commit is present and that `state.json` still describes iteration `N`.
+3. Publish only the matching `state.json` transition to `main`.
+   - Commit message: `iter NNNN checkpoint`
 
-- do not treat the iteration as completed;
-- do not overwrite newer `main` state;
+### Review mode
+
+1. Create and publish `reviews/NNNN.md` to `main`.
+   - Commit message: `iter NNNN review-content`
+2. Re-read current `main` and verify that the review file is present and that `state.json` still describes iteration `N`.
+3. Publish only the matching `state.json` transition to `main`.
+   - Commit message: `iter NNNN checkpoint`
+
+Here `NNNN` is the zero-padded value of `state.iteration` at the start of the iteration.
+
+The `state.json` commit is the **checkpoint**. An iteration is complete only after that checkpoint is visible on `main`.
+
+Never advance `state.json` before its corresponding content/review artifact is visible on `main`.
+
+## Recovery
+
+A scheduled run may begin after the artifact commit succeeded but before its checkpoint commit succeeded. Recovery must finish that iteration rather than generate it again.
+
+### Recovering write mode
+
+If `state.json` still describes iteration `N` in write mode:
+
+1. Inspect recent `main` history for a commit whose message starts with `iter NNNN write-content:`.
+2. Accept it as a pending artifact only if:
+   - it is on current canonical `main`;
+   - it is newer than the state/checkpoint from which iteration `N` began;
+   - its relevant project change is only `story.md`;
+   - there is no later `iter NNNN checkpoint`;
+   - the resulting story is coherent with the current roadmap and mode constraints.
+3. If those checks pass, do **not** generate more prose. Publish only the missing `state.json` transition as `iter NNNN checkpoint`.
+4. If a matching artifact is ambiguous or invalid, stop and report the blocker rather than guessing.
+
+### Recovering review mode
+
+If `state.json` still describes iteration `N` in review mode and `reviews/NNNN.md` already exists on current `main`:
+
+1. Validate that the file is the pending review artifact for iteration `N` and that no later `iter NNNN checkpoint` exists.
+2. If valid, do **not** write another review. Publish only the missing `state.json` transition as `iter NNNN checkpoint`.
+3. If the existing review is ambiguous or invalid, stop and report the blocker.
+
+## Concurrency and publication failures
+
+Immediately before every repository write, re-read the relevant current `main` file/version required by the connected GitHub write mechanism.
+
+If another actor has advanced `main` in a way that invalidates the iteration:
+
+- do not overwrite the newer state;
+- do not force the write;
 - stop the run;
-- let a later run reload the new canonical state and decide what to do from there.
+- let a later run reload canonical state.
 
-The scheduler must never continue working from a stale cached copy of `state.json`.
+If the artifact commit succeeds but the checkpoint fails, report the iteration as **partially published, pending checkpoint**. The next run should recover it using the rules above.
+
+If the artifact write itself fails, the iteration remains unpublished and `state.json` must remain unchanged.
+
+Normal scheduled runs should not create pull requests or long-lived agent branches for iteration publication.
 
 ## Stop brake
 
@@ -81,10 +138,12 @@ For creative decisions:
 3. The latest review defines the immediate work priority.
 4. The active mode defines what kind of work may happen in this iteration.
 
-If an immediate review priority conflicts with the roadmap, the roadmap wins. The writer should mention the conflict in the iteration's commit summary rather than silently following the conflicting review.
+If an immediate review priority conflicts with the roadmap, the roadmap wins. The writer should mention the conflict in the write-content commit summary rather than silently following the conflicting review.
 
 ## One run means one iteration
 
 Do not chain several write/review iterations inside one scheduled invocation, even when time or token budget remains.
+
+Recovery of a partially published current iteration counts as that run's one iteration.
 
 The experiment depends on each iteration being individually inspectable in Git history.
