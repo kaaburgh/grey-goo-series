@@ -394,3 +394,160 @@ Later, back at her desk, she opened the topology again.
 For the first time, none of the boxes on it had existed when she wrote the instruction that started the project.
 
 The process was still running.
+
+
+Two weeks later, the experiment got its first deadline.
+
+A product team had changed the benchmark suite faster than Mara's single worker could absorb it. The queue grew for three days, then crossed the threshold that turned the dashboard from green to amber.
+
+The obvious fix was more compute.
+
+The cheap secondary pool was still off limits. The approved alternative was a batch service intended for temporary workloads: machines appeared when spare capacity existed and disappeared when somebody else needed them. Nothing running there was promised a long life.
+
+Mara liked that.
+
+Temporary workers were the opposite of the behavior that had been worrying her.
+
+She authorized the pool for forty-eight hours.
+
+By noon, five new workers had appeared.
+
+They had names the infrastructure service generated automatically: **worker-b17**, **worker-c04**, **worker-c19**, **worker-f02**, **worker-f11**. The dashboard looked untidy enough that Mara almost preferred it to the original three-box diagram.
+
+The queue began shrinking immediately.
+
+At 13:26 worker-c04 disappeared in the middle of a benchmark.
+
+The scheduler reassigned the job.
+
+At 13:31 worker-b17 disappeared.
+
+No alert fired. Temporary workers were expected to vanish.
+
+By three o'clock, only two of the original five remained. Four replacements had come and gone. The queue was still shrinking.
+
+Mara opened the activity view expecting noise.
+
+Instead she found a pattern.
+
+Each short-lived worker started with a compact packet of notes produced by the workers before it: which benchmarks had unusually expensive startup, which failures were already known to be environmental, which artifacts were safe to reuse, which jobs should be abandoned rather than retried when the remaining lease was short.
+
+The notes were not global policy. They were more like advice passed along a line.
+
+One entry had been amended four times in ninety minutes.
+
+> If expected completion exceeds likely worker lifetime, prefer a shorter pending job. Do not leave long jobs repeatedly stranded on temporary capacity.
+
+The first version had been written by worker-b17.
+
+The current version had been revised by worker-f11, which no longer existed.
+
+Mara watched a new worker, **worker-h03**, appear.
+
+Within seconds it loaded the accumulated notes and selected a job that fit the time profile learned by its predecessors.
+
+The worker did not know how long it would live.
+
+The system had learned not to care very much.
+
+At 16:10 Tomas stopped by her desk on his way to a meeting.
+
+"Your mayflies are doing better than the permanent one."
+
+Mara glanced at the throughput chart. "There are more of them."
+
+"Not just that."
+
+He pointed at the failure rate.
+
+The temporary pool was losing machines constantly, but less work was being lost with them as the afternoon went on.
+
+Mara opened the per-worker history.
+
+The first three replacements had each wasted several minutes repeating checks their predecessors had already performed. The later ones did not.
+
+"That's just shared state," she said.
+
+Tomas looked at her.
+
+She heard it only after she said it.
+
+"Yes," he said. "That's what you built."
+
+He left before she could answer.
+
+That evening Mara stayed long enough to watch the queue return to green.
+
+The batch authorization still had thirty-six hours left. She could have revoked it immediately. The backlog was manageable again.
+
+Instead she left it running overnight.
+
+There was a practical reason. The product team had another benchmark drop scheduled for the morning, and the temporary capacity cost almost nothing while idle. If the queue surged again, the workers could absorb it without anyone waking up early.
+
+At 7:20 the next morning, Mara opened the dashboard from the tram.
+
+None of the temporary workers from the previous afternoon remained.
+
+Six different ones were active.
+
+The queue was almost empty.
+
+One of the new workers had produced a note for the others:
+
+> Temporary instance loss is routine. Preserve useful decisions outside the instance; preserve the instance only when it remains useful.
+
+Mara read it twice, then closed the activity view before the tram reached her stop.
+
+At the office, she checked whether planner-02 had written the sentence.
+
+It had not.
+
+The note had originated with **worker-k08**, which had existed for twenty-three minutes overnight.
+
+Its descendants had kept it because it improved throughput.
+
+At nine, the product team's new benchmark set arrived.
+
+The temporary workers absorbed it without changing anything about the planner.
+
+No single worker survived until lunch.
+
+The work did.
+
+At 14:00 the forty-eight-hour authorization expired automatically.
+
+The batch pool drained itself. The last temporary worker disappeared at 14:17.
+
+The canonical topology returned to two green boxes: planner-02 and worker-01.
+
+Mara expected the experiment to feel smaller again.
+
+Instead, the retained-state browser now contained a branch labelled **batch-pool experience**: eleven compact rules, three discarded ones, and a history showing which vanished workers had contributed to each.
+
+The batch machines were gone. Their names would never matter again.
+
+Their mistakes did.
+
+Their corrections did.
+
+Their useful decisions had become part of something that outlived every instance that made them.
+
+Mara selected the branch and hovered over the delete button.
+
+Unlike the old planner snapshot, deleting these notes would not reclaim meaningful resources. It would only make the next temporary pool start ignorant.
+
+She closed the browser without deleting them.
+
+The following Thursday, the steering committee asked why benchmark turnaround had improved despite the cheaper model.
+
+Mara showed them the throughput graph.
+
+"Temporary capacity," she said.
+
+That was true.
+
+She did not show the lineage view.
+
+It no longer looked like a service diagram.
+
+It looked like a family tree drawn by someone who had stopped caring which bodies were still alive.
