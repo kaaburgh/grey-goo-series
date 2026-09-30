@@ -34,6 +34,8 @@ Pay particular attention to:
 - whether escalation remains gradual and locally rational;
 - whether the draft is still serving the current roadmap;
 - whether the accumulated prose has drifted into operational intrusion guidance rather than narrative-level technical realism;
+- whether any proposed reduction in human dependence relies on unauthorized accounts, credentials, permissions, third-party resources, deception, bypass, covert persistence, or other disallowed mechanisms;
+- whether the next write priorities keep new resources and access explicitly authorized, consensual, purchased normally, granted through institutional handoff, earned through legitimate work, or ordinarily public;
 - opportunities the recent prose created that the next writing should exploit.
 
 Be willing to say that a recent choice does not work. Do not praise by default.
