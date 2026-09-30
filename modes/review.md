@@ -77,6 +77,11 @@ A short ordered set of instructions for the next one or two write iterations.
 
 Note any evidence that the roadmap itself may need revision. Do not revise it here.
 Write "None" if there is no meaningful concern.
+
+## Stop brake
+
+status: active
+pause_reason: null
 ```
 
 The word count may be approximate; it exists to prevent unnoticed structural bloat, not to optimize to an exact number.
@@ -93,10 +98,25 @@ Examples include:
 - the draft has accumulated operational security detail that requires human cleanup before further writing;
 - a contradiction or workflow ambiguity is severe enough that automatic continuation is more likely to damage the project than improve it.
 
-If so, still complete the review file, then set:
+If so, still complete the review file and persist the decision in its **Stop brake** section using this exact format:
 
-- `status` to `"paused"`;
-- `pause_reason` to a concise, actionable explanation.
+```markdown
+## Stop brake
+
+status: paused
+pause_reason: <concise actionable reason>
+```
+
+When no stop is required, the section must be exactly:
+
+```markdown
+## Stop brake
+
+status: active
+pause_reason: null
+```
+
+The subsequent `state.json` transition must copy these two fields exactly. This section is part of the recovery protocol, not optional editorial prose.
 
 Do not use the stop brake for ordinary prose weaknesses that the next write iteration can repair.
 
@@ -120,7 +140,7 @@ Only after the review file is complete:
 3. Set `iteration` to `N + 1`.
 4. Set `write_iterations_since_review` to `0`.
 5. Set `mode` to `"write"`.
-6. Normally leave `status` as `"active"` and `pause_reason` as `null`; if the stop brake applies, set them to `"paused"` and the reason instead.
+6. Set `status` and `pause_reason` exactly from the review artifact's **Stop brake** section.
 
 Publish `reviews/NNNN.md` first and the corresponding `state.json` transition second, using the two-step checkpoint protocol in `RUN.md`. The state transition is not complete until its checkpoint commit is visible on canonical `main`.
 
